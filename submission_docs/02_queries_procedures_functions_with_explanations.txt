@@ -1,0 +1,94 @@
+Queries, Procedures with Explanations
+=====================================================
+
+
+
+1. Table Creation
+-----------------
+`error_log`
+- Purpose: Stores processing errors and original JSON payloads.
+- Main columns:
+  - `error_message` (TEXT)
+  - `json_input` (JSON)
+  - `created_at` (TIMESTAMP)
+
+2. Report Views
+---------------
+`vw_total_sales_per_seller`
+- Aggregates total quantity and total revenue per seller.
+- Joins seller identity data (`first_name`, `last_name`).
+
+`vw_seller_ranking`
+- Calculates total revenue per seller.
+- Uses `RANK() OVER (ORDER BY total_revenue DESC)` for ranking.
+
+`vw_avg_sale_per_seller`
+- Calculates average sale amount per seller.
+
+3. Random Data Generation Procedures
+------------------------------------
+`p_generate_random_customers(IN p_count INT)`
+- Creates random customer names and assigns random city/country.
+- Avoids duplicate name combinations.
+
+`p_generate_random_sellers(IN p_count INT)`
+- Creates random sellers with generated emails.
+- Avoids duplicates and respects unique email requirement.
+
+`p_generate_random_sales(IN p_count INT)`
+- Randomly selects customer, seller, and product.
+- Generates quantity and sale date.
+- Inserts sales with calculated `sale_amount`.
+
+`p_generate_random_data(IN p_customers INT, IN p_sellers INT, IN p_sales INT)`
+- Runs the three generation procedures in one transaction.
+- Returns the newly inserted customers, sellers, and sales.
+
+4. JSON Validation and Insert Procedures
+----------------------------------------
+`p_log_error(IN p_message TEXT, IN p_json JSON)`
+- Inserts one error record into `error_log`.
+
+`p_validate_json_structure(IN p_json JSON, OUT p_is_valid BOOLEAN, OUT p_error_message TEXT)`
+- Validates required JSON paths:
+  - `$.sales`
+  - `$.sales.CustomerFirstName`
+  - `$.sales.CustomerLastName`
+  - `$.sales.SellerID`
+  - `$.sales.purchases`
+
+`p_validate_seller(IN p_json JSON, OUT p_is_valid BOOLEAN, OUT p_error_message TEXT)`
+- Verifies that `SellerID` exists in `sellers`.
+
+`p_insert_sales_from_json(IN p_json JSON)`
+- Full JSON ingestion pipeline:
+  1. Validates JSON structure.
+  2. Validates seller existence.
+  3. Finds or creates customer.
+  4. Uses `JSON_TABLE` to unpack purchases.
+  5. Marks each purchase as `VALID` or specific error.
+  6. Logs invalid items into `error_log`.
+  7. Inserts only valid items into `sales`.
+  8. Returns JSON result with:
+     - `inserted_rows`
+     - `failed_rows`
+     - `status`
+     - `failed_items`
+     - `completed_items`
+
+5. Cleanup Procedure
+--------------------
+`p_cleanup_demo_data(IN p_customer_threshold INT, IN p_seller_threshold INT)`
+- Deletes demo sales first (to satisfy foreign keys).
+- Deletes demo customers and sellers above threshold IDs.
+- Clears `error_log`.
+- Returns summary:
+  - `deleted_sales`
+  - `deleted_customers`
+  - `deleted_sellers`
+  - `deleted_error_logs`
+  - `status`
+
+
+
+

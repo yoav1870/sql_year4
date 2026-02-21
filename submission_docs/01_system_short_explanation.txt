@@ -1,0 +1,27 @@
+System Short Explanation
+========================
+
+System name:
+Sales Management + JSON Ingestion System
+
+Overview:
+This system manages sales data in a MySQL database called `sales`. 
+It includes core entities such as customers, sellers, products, regions, and sales transactions. 
+The system also supports reporting, JSON-based sales ingestion, error logging, demo data generation, and cleanup.
+
+Main database components:
+- Tables: `customers`, `sellers`, `products`, `regions`, `sales`, `error_log`
+- Report views:
+  - `vw_total_sales_per_seller`
+  - `vw_seller_ranking`
+  - `vw_avg_sale_per_seller`
+- Stored procedures:
+  - Random data generation (`p_generate_random_*`, `p_generate_random_data`)
+  - JSON validation and insertion (`p_validate_json_structure`, `p_validate_seller`, `p_insert_sales_from_json`)
+  - Error logging (`p_log_error`)
+  - Demo data cleanup (`p_cleanup_demo_data`)
+
+
+Summary:
+The project provides an end-to-end database workflow: 
+data generation, data ingestion, validation, error tracking, reporting, and environment cleanup.
