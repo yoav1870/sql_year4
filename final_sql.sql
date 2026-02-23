@@ -437,6 +437,8 @@ insert_block: BEGIN
     DECLARE v_last_name VARCHAR(50);
     DECLARE v_inserted_count INT DEFAULT 0;
     DECLARE v_failed_count INT DEFAULT 0;
+    DECLARE v_failed_items_json JSON;
+    DECLARE v_completed_items_json JSON;
 
     DECLARE v_is_valid BOOLEAN;
     DECLARE v_error TEXT;
@@ -546,41 +548,41 @@ insert_block: BEGIN
 
     COMMIT;
 
+    SELECT IFNULL(
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'productId', productId,
+                'quantity', quantity,
+                'saleDate', saleDate,
+                'error', validation_status
+            )
+        ),
+        JSON_ARRAY()
+    )
+    INTO v_failed_items_json
+    FROM tmp_purchases
+    WHERE validation_status <> 'VALID';
+
+    SELECT IFNULL(
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'productId', productId,
+                'quantity', quantity,
+                'saleDate', saleDate
+            )
+        ),
+        JSON_ARRAY()
+    )
+    INTO v_completed_items_json
+    FROM tmp_purchases
+    WHERE validation_status = 'VALID';
+
     SELECT JSON_OBJECT(
         'inserted_rows', v_inserted_count,
         'failed_rows', v_failed_count,
         'status', 'Completed',
-        'failed_items',
-            IFNULL(
-                (
-                    SELECT JSON_ARRAYAGG(
-                        JSON_OBJECT(
-                            'productId', productId,
-                            'quantity', quantity,
-                            'saleDate', saleDate,
-                            'error', validation_status
-                        )
-                    )
-                    FROM tmp_purchases
-                    WHERE validation_status <> 'VALID'
-                ),
-                JSON_ARRAY()
-            ),
-        'completed_items',
-            IFNULL(
-                (
-                    SELECT JSON_ARRAYAGG(
-                        JSON_OBJECT(
-                            'productId', productId,
-                            'quantity', quantity,
-                            'saleDate', saleDate
-                        )
-                    )
-                    FROM tmp_purchases
-                    WHERE validation_status = 'VALID'
-                ),
-                JSON_ARRAY()
-            )
+        'failed_items', IFNULL(v_failed_items_json, JSON_ARRAY()),
+        'completed_items', IFNULL(v_completed_items_json, JSON_ARRAY())
     ) AS result;
 
 END$$
