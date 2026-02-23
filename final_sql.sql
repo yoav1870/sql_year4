@@ -140,97 +140,67 @@ DELIMITER $$
 CREATE PROCEDURE p_generate_random_customers(IN p_count INT)
 BEGIN
     DECLARE v_counter INT DEFAULT 0;
-    DECLARE v_exists INT DEFAULT 1;
-    DECLARE v_random_city VARCHAR(50);
-    DECLARE v_random_country VARCHAR(50);
     DECLARE v_seed_first_name VARCHAR(50);
     DECLARE v_seed_last_name VARCHAR(50);
-    DECLARE v_first_name VARCHAR(50);
-    DECLARE v_last_name VARCHAR(50);
-    DECLARE v_first_name_max_len INT;
-    DECLARE v_last_name_max_len INT;
-    DECLARE v_token BIGINT UNSIGNED;
-
-    SELECT c.CHARACTER_MAXIMUM_LENGTH
-    INTO v_first_name_max_len
-    FROM INFORMATION_SCHEMA.COLUMNS c
-    WHERE c.TABLE_SCHEMA = DATABASE()
-      AND c.TABLE_NAME = 'customers'
-      AND c.COLUMN_NAME = 'first_name'
-    LIMIT 1;
-
-    SELECT c.CHARACTER_MAXIMUM_LENGTH
-    INTO v_last_name_max_len
-    FROM INFORMATION_SCHEMA.COLUMNS c
-    WHERE c.TABLE_SCHEMA = DATABASE()
-      AND c.TABLE_NAME = 'customers'
-      AND c.COLUMN_NAME = 'last_name'
-    LIMIT 1;
-
-    IF v_first_name_max_len IS NULL OR v_last_name_max_len IS NULL THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Missing customers column metadata';
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1
-        FROM customers
-        WHERE first_name IS NOT NULL
-          AND last_name IS NOT NULL
-    ) THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Cannot generate customers without existing customer names';
-    END IF;
+    DECLARE v_seed_city VARCHAR(50);
+    DECLARE v_seed_country VARCHAR(50);
+    DECLARE v_new_first_name VARCHAR(50);
+    DECLARE v_new_last_name VARCHAR(50);
+    DECLARE v_suffix BIGINT UNSIGNED;
 
     WHILE v_counter < p_count DO
 
-        SET v_exists = 1;
-
-        WHILE v_exists > 0 DO
-            SELECT first_name, last_name
-            INTO v_seed_first_name, v_seed_last_name
-            FROM customers
-            WHERE first_name IS NOT NULL
-              AND last_name IS NOT NULL
-            ORDER BY RAND()
-            LIMIT 1;
-
-            SET v_token = UUID_SHORT();
-            SET v_first_name = LEFT(CONCAT(v_seed_first_name, v_token), v_first_name_max_len);
-            SET v_last_name = LEFT(CONCAT(v_seed_last_name, v_token), v_last_name_max_len);
-
-            SELECT COUNT(*)
-            INTO v_exists
-            FROM customers
-            WHERE first_name = v_first_name
-              AND last_name = v_last_name;
-        END WHILE;
-
-        SELECT city, country
-        INTO v_random_city, v_random_country
+        SELECT first_name, last_name, city, country
+        INTO v_seed_first_name, v_seed_last_name, v_seed_city, v_seed_country
         FROM customers
-        WHERE city IS NOT NULL
-          AND country IS NOT NULL
+        WHERE first_name IS NOT NULL
+          AND last_name IS NOT NULL
         ORDER BY RAND()
         LIMIT 1;
 
-        IF v_random_city IS NULL THEN
+        IF v_seed_first_name IS NULL OR v_seed_last_name IS NULL THEN
+            SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'Cannot generate customers without existing customer names';
+        END IF;
+
+        IF v_seed_city IS NULL THEN
             SELECT city
-            INTO v_random_city
+            INTO v_seed_city
             FROM regions
             ORDER BY RAND()
             LIMIT 1;
         END IF;
 
+        IF v_seed_country IS NULL THEN
+            SELECT country
+            INTO v_seed_country
+            FROM customers
+            WHERE country IS NOT NULL
+            ORDER BY RAND()
+            LIMIT 1;
+        END IF;
+
+        SET v_suffix = UUID_SHORT();
+        SET v_new_first_name = LEFT(CONCAT(v_seed_first_name, '_', v_suffix), 50);
+        SET v_new_last_name = LEFT(CONCAT(v_seed_last_name, '_', v_suffix), 50);
+
         INSERT INTO customers(first_name, last_name, city, country)
-        VALUES (
-            v_first_name,
-            v_last_name,
-            v_random_city,
-            v_random_country
+        SELECT
+            v_new_first_name,
+            v_new_last_name,
+            v_seed_city,
+            v_seed_country
+        FROM DUAL
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM customers
+            WHERE first_name = v_new_first_name
+              AND last_name = v_new_last_name
         );
 
-        SET v_counter = v_counter + 1;
+        IF ROW_COUNT() = 1 THEN
+            SET v_counter = v_counter + 1;
+        END IF;
 
     END WHILE;
 
@@ -243,41 +213,13 @@ DELIMITER $$
 CREATE PROCEDURE p_generate_random_sellers(IN p_count INT)
 BEGIN
     DECLARE v_counter INT DEFAULT 0;
-    DECLARE v_exists INT DEFAULT 1;
     DECLARE v_seed_first_name VARCHAR(50);
     DECLARE v_seed_last_name VARCHAR(50);
-    DECLARE v_first_name VARCHAR(50);
-    DECLARE v_last_name VARCHAR(50);
+    DECLARE v_new_first_name VARCHAR(50);
+    DECLARE v_new_last_name VARCHAR(50);
     DECLARE v_email VARCHAR(100);
     DECLARE v_email_domain VARCHAR(100);
-    DECLARE v_first_name_max_len INT;
-    DECLARE v_last_name_max_len INT;
-    DECLARE v_email_max_len INT;
-    DECLARE v_token BIGINT UNSIGNED;
-
-    SELECT c.CHARACTER_MAXIMUM_LENGTH
-    INTO v_first_name_max_len
-    FROM INFORMATION_SCHEMA.COLUMNS c
-    WHERE c.TABLE_SCHEMA = DATABASE()
-      AND c.TABLE_NAME = 'sellers'
-      AND c.COLUMN_NAME = 'first_name'
-    LIMIT 1;
-
-    SELECT c.CHARACTER_MAXIMUM_LENGTH
-    INTO v_last_name_max_len
-    FROM INFORMATION_SCHEMA.COLUMNS c
-    WHERE c.TABLE_SCHEMA = DATABASE()
-      AND c.TABLE_NAME = 'sellers'
-      AND c.COLUMN_NAME = 'last_name'
-    LIMIT 1;
-
-    SELECT c.CHARACTER_MAXIMUM_LENGTH
-    INTO v_email_max_len
-    FROM INFORMATION_SCHEMA.COLUMNS c
-    WHERE c.TABLE_SCHEMA = DATABASE()
-      AND c.TABLE_NAME = 'sellers'
-      AND c.COLUMN_NAME = 'email'
-    LIMIT 1;
+    DECLARE v_suffix BIGINT UNSIGNED;
 
     SELECT SUBSTRING_INDEX(email, CHAR(64), -1)
     INTO v_email_domain
@@ -287,10 +229,7 @@ BEGIN
     ORDER BY RAND()
     LIMIT 1;
 
-    IF v_first_name_max_len IS NULL
-       OR v_last_name_max_len IS NULL
-       OR v_email_max_len IS NULL
-       OR v_email_domain IS NULL THEN
+    IF v_email_domain IS NULL THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Missing seller generation metadata';
     END IF;
@@ -307,47 +246,43 @@ BEGIN
 
     WHILE v_counter < p_count DO
 
-        SET v_exists = 1;
+        SELECT first_name, last_name
+        INTO v_seed_first_name, v_seed_last_name
+        FROM sellers
+        WHERE first_name IS NOT NULL
+          AND last_name IS NOT NULL
+        ORDER BY RAND()
+        LIMIT 1;
 
-        WHILE v_exists > 0 DO
-
-            SELECT first_name, last_name
-            INTO v_seed_first_name, v_seed_last_name
-            FROM sellers
-            WHERE first_name IS NOT NULL
-              AND last_name IS NOT NULL
-            ORDER BY RAND()
-            LIMIT 1;
-
-            SET v_token = UUID_SHORT();
-            SET v_first_name = LEFT(CONCAT(v_seed_first_name, v_token), v_first_name_max_len);
-            SET v_last_name = LEFT(CONCAT(v_seed_last_name, v_token), v_last_name_max_len);
-            SET v_email = LEFT(
-                CONCAT(
-                    LOWER(REPLACE(CONCAT(v_first_name, v_last_name, v_token), ' ', '')),
-                    CHAR(64),
-                    v_email_domain
-                ),
-                v_email_max_len
-            );
-
-            SELECT COUNT(*)
-            INTO v_exists
-            FROM sellers
-            WHERE (first_name = v_first_name AND last_name = v_last_name)
-               OR email = v_email;
-
-        END WHILE;
-
-        INSERT INTO sellers(first_name, last_name, email, created_at)
-        VALUES (
-            v_first_name,
-            v_last_name,
-            v_email,
-            CURDATE()
+        SET v_suffix = UUID_SHORT();
+        SET v_new_first_name = LEFT(CONCAT(v_seed_first_name, '_', v_suffix), 50);
+        SET v_new_last_name = LEFT(CONCAT(v_seed_last_name, '_', v_suffix), 50);
+        SET v_email = LEFT(
+            CONCAT(
+                LOWER(REPLACE(CONCAT(v_new_first_name, '.', v_new_last_name, v_suffix), ' ', '')),
+                CHAR(64),
+                v_email_domain
+            ),
+            100
         );
 
-        SET v_counter = v_counter + 1;
+        INSERT INTO sellers(first_name, last_name, email, created_at)
+        SELECT
+            v_new_first_name,
+            v_new_last_name,
+            v_email,
+            CURDATE()
+        FROM DUAL
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM sellers
+            WHERE (first_name = v_new_first_name AND last_name = v_new_last_name)
+               OR email = v_email
+        );
+
+        IF ROW_COUNT() = 1 THEN
+            SET v_counter = v_counter + 1;
+        END IF;
 
     END WHILE;
 
@@ -358,9 +293,7 @@ DELIMITER ;
 DELIMITER $$
 
 CREATE PROCEDURE p_generate_random_sales(
-    IN p_count INT,
-    IN p_min_customer_id INT,
-    IN p_min_seller_id INT
+    IN p_count INT
 )
 BEGIN
     DECLARE v_counter INT DEFAULT 0;
@@ -370,46 +303,28 @@ BEGIN
     DECLARE v_price DECIMAL(10,2);
     DECLARE v_quantity INT;
     DECLARE v_sale_date DATE;
-    DECLARE v_min_sale_quantity INT;
-    DECLARE v_max_sale_quantity INT;
-    DECLARE v_max_sale_days_back INT;
-    DECLARE v_quantity_range INT;
+    DECLARE v_seed_rows INT DEFAULT 0;
 
-    SELECT
-        MIN(quantity),
-        MAX(quantity),
-        MAX(DATEDIFF(CURDATE(), sale_date))
-    INTO
-        v_min_sale_quantity,
-        v_max_sale_quantity,
-        v_max_sale_days_back
+    SELECT COUNT(*)
+    INTO v_seed_rows
     FROM sales
     WHERE quantity IS NOT NULL
       AND sale_date IS NOT NULL;
 
-    IF v_min_sale_quantity IS NULL
-       OR v_max_sale_quantity IS NULL
-       OR v_max_sale_days_back IS NULL
-       OR v_min_sale_quantity <= 0
-       OR v_max_sale_quantity < v_min_sale_quantity
-       OR v_max_sale_days_back <= 0 THEN
+    IF v_seed_rows = 0 THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Cannot derive random-sales limits from existing sales data';
+            SET MESSAGE_TEXT = 'Cannot generate sales without existing sales history';
     END IF;
-
-    SET v_quantity_range = (v_max_sale_quantity - v_min_sale_quantity) + 1;
 
     WHILE v_counter < p_count DO
 
         SELECT customer_id INTO v_customer_id
         FROM customers
-        WHERE customer_id >= p_min_customer_id
         ORDER BY RAND()
         LIMIT 1;
 
         SELECT seller_id INTO v_seller_id
         FROM sellers
-        WHERE seller_id >= p_min_seller_id
         ORDER BY RAND()
         LIMIT 1;
 
@@ -419,8 +334,13 @@ BEGIN
         ORDER BY RAND()
         LIMIT 1;
 
-        SET v_quantity = FLOOR(v_min_sale_quantity + RAND() * v_quantity_range);
-        SET v_sale_date = DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * (v_max_sale_days_back + 1)) DAY);
+        SELECT quantity, sale_date
+        INTO v_quantity, v_sale_date
+        FROM sales
+        WHERE quantity IS NOT NULL
+          AND sale_date IS NOT NULL
+        ORDER BY RAND()
+        LIMIT 1;
 
         INSERT INTO sales(product_id, customer_id, sale_date, quantity, sale_amount, id_seller)
         VALUES (
@@ -460,11 +380,7 @@ main_block: BEGIN
 
     CALL p_generate_random_customers(p_customers);
     CALL p_generate_random_sellers(p_sellers);
-    CALL p_generate_random_sales(
-        p_sales,
-        v_max_customer_before + 1,
-        v_max_seller_before + 1
-    );
+    CALL p_generate_random_sales(p_sales);
 
     COMMIT;
 
