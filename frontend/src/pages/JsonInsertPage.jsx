@@ -269,6 +269,18 @@ function JsonInsertPage() {
 
       {result && (
         <Table
+          title="Completed Items"
+          columns={[
+            { key: "productId", label: "Product ID" },
+            { key: "quantity", label: "Quantity" },
+            { key: "saleDate", label: "Sale Date" }
+          ]}
+          rows={Array.isArray(result.completed_items) ? result.completed_items : []}
+        />
+      )}
+
+      {result && (
+        <Table
           title="Failed Items"
           columns={[
             { key: "productId", label: "Product ID" },
