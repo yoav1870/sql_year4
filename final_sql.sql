@@ -1,4 +1,304 @@
-use sales;
+﻿-- Full rebuild script (database + initial data + project procedures/views/tests)
+DROP DATABASE IF EXISTS sales;
+CREATE DATABASE sales CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE sales;
+
+-- MySQL dump 10.13  Distrib 8.0.38, for Win64 (x86_64)
+--
+-- Host: localhost    Database: sales
+-- ------------------------------------------------------
+-- Server version	8.0.39
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `customers`
+--
+
+DROP TABLE IF EXISTS `customers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `customers` (
+  `customer_id` int NOT NULL AUTO_INCREMENT,
+  `first_name` varchar(50) DEFAULT NULL,
+  `last_name` varchar(50) DEFAULT NULL,
+  `city` varchar(50) DEFAULT NULL,
+  `country` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`customer_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=270 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `customers`
+--
+
+LOCK TABLES `customers` WRITE;
+/*!40000 ALTER TABLE `customers` DISABLE KEYS */;
+INSERT INTO `customers` VALUES (201,'John','Doe','New York','USA'),(202,'Jane','Smith','London','UK'),(203,'Alice','Johnson','Sydney','Australia'),(204,'Robert','Brown','Toronto','Canada'),(205,'Emily','Davis','New York','USA'),(206,'Michael','Miller','Berlin','Germany'),(207,'Sarah','Wilson','Paris','France'),(208,'David','Anderson','Tokyo','Japan'),(209,'Linda','Thomas','Los Angeles','USA'),(210,'Daniel','Taylor','Rome','Italy'),(231,'Anna','White',NULL,NULL),(232,'Sara','Blue',NULL,NULL),(233,'Tom','Green',NULL,NULL),(234,'David','Black',NULL,NULL);
+/*!40000 ALTER TABLE `customers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `error_log`
+--
+
+DROP TABLE IF EXISTS `error_log`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `error_log` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `error_message` text,
+  `json_input` json DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `error_log`
+--
+
+LOCK TABLES `error_log` WRITE;
+/*!40000 ALTER TABLE `error_log` DISABLE KEYS */;
+/*!40000 ALTER TABLE `error_log` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `products`
+--
+
+DROP TABLE IF EXISTS `products`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `products` (
+  `product_id` int NOT NULL,
+  `product_name` varchar(100) DEFAULT NULL,
+  `category` varchar(50) DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `products`
+--
+
+LOCK TABLES `products` WRITE;
+/*!40000 ALTER TABLE `products` DISABLE KEYS */;
+INSERT INTO `products` VALUES (101,'Product A','Electronics',150.00),(102,'Product B','Clothing',75.00),(103,'Product C','Home Goods',100.00),(104,'Product D','Electronics',150.00),(105,'Product E','Clothing',150.00),(106,'Product F','Home Goods',100.00),(107,'Product G','Electronics',150.00);
+/*!40000 ALTER TABLE `products` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `regions`
+--
+
+DROP TABLE IF EXISTS `regions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `regions` (
+  `city` varchar(50) NOT NULL,
+  `region` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`city`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `regions`
+--
+
+LOCK TABLES `regions` WRITE;
+/*!40000 ALTER TABLE `regions` DISABLE KEYS */;
+INSERT INTO `regions` VALUES ('Berlin','Europe'),('London','Europe'),('Los Angeles','North America'),('New York','North America'),('Paris','Europe'),('Rome','Europe'),('Sydney','Oceania'),('Tokyo','Asia'),('Toronto','North America');
+/*!40000 ALTER TABLE `regions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sales`
+--
+
+DROP TABLE IF EXISTS `sales`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sales` (
+  `sale_id` int NOT NULL AUTO_INCREMENT,
+  `product_id` int DEFAULT NULL,
+  `customer_id` int DEFAULT NULL,
+  `sale_date` date DEFAULT NULL,
+  `quantity` int DEFAULT NULL,
+  `sale_amount` decimal(10,2) DEFAULT NULL,
+  `id_seller` int DEFAULT NULL,
+  PRIMARY KEY (`sale_id`),
+  KEY `fk_sales_seller` (`id_seller`),
+  KEY `fk_sales_customer` (`customer_id`),
+  KEY `fk_sales_product` (`product_id`),
+  CONSTRAINT `fk_sales_customer` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_sales_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_sales_seller` FOREIGN KEY (`id_seller`) REFERENCES `sellers` (`seller_id`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=167 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sales`
+--
+
+LOCK TABLES `sales` WRITE;
+/*!40000 ALTER TABLE `sales` DISABLE KEYS */;
+INSERT INTO `sales` VALUES (1,101,201,'2024-01-05',3,450.00,3),(2,102,202,'2024-02-10',1,150.00,2),(3,103,203,'2024-03-15',2,300.00,8),(4,104,204,'2024-04-01',5,750.00,3),(5,101,205,'2024-04-20',2,300.00,1),(6,102,206,'2024-05-10',4,600.00,6),(7,103,207,'2024-06-15',1,100.00,7),(8,105,208,'2024-07-05',3,450.00,4),(9,106,209,'2024-08-10',2,200.00,1),(10,107,210,'2024-09-01',6,900.00,3),(12,107,210,'2025-04-14',2,300.00,1),(14,101,206,'2025-09-22',3,450.00,20),(16,101,209,'2025-03-28',4,600.00,15),(21,102,206,'2026-01-22',4,300.00,1),(23,103,208,'2025-11-07',7,700.00,13),(30,107,204,'2025-07-08',10,1500.00,4),(51,101,201,'2024-12-01',2,300.00,1),(52,102,201,'2024-12-05',3,225.00,1),(54,101,234,'2024-12-01',2,300.00,1),(55,101,201,'2024-12-01',2,300.00,1),(56,102,201,'2024-12-05',3,225.00,1),(58,101,201,'2024-12-01',2,300.00,1),(59,102,201,'2024-12-05',3,225.00,1),(61,101,234,'2024-12-01',2,300.00,1),(62,101,201,'2024-12-01',2,300.00,1),(63,102,201,'2024-12-05',3,225.00,1),(65,101,234,'2024-12-01',2,300.00,1),(66,101,201,'2024-12-01',2,300.00,1),(67,102,201,'2024-12-05',3,225.00,1),(69,102,233,'2025-08-25',10,750.00,20),(70,101,201,'2026-02-20',2,300.00,1),(71,101,201,'2024-12-01',2,300.00,1),(72,102,201,'2024-12-05',3,225.00,1),(78,103,233,'2026-01-02',4,400.00,9),(79,107,206,'2026-01-11',9,1350.00,15),(87,101,234,'2025-07-18',8,1200.00,3),(92,106,205,'2025-09-17',2,200.00,18),(95,105,205,'2025-12-17',4,600.00,5),(100,104,209,'2025-11-25',8,1200.00,17),(104,107,234,'2025-04-07',1,150.00,2),(105,103,232,'2025-10-11',9,900.00,7),(106,107,232,'2025-05-14',7,1050.00,10),(111,101,203,'2025-06-18',8,1200.00,18),(116,105,206,'2025-09-01',3,450.00,13),(119,102,231,'2026-01-23',5,375.00,6),(123,103,202,'2025-05-19',8,800.00,4),(127,104,204,'2025-07-19',10,1500.00,8),(133,104,205,'2025-06-24',6,900.00,20),(135,101,201,'2024-12-01',2,300.00,1),(136,102,201,'2024-12-05',3,225.00,1),(138,101,234,'2024-12-01',2,300.00,1),(139,101,201,'2024-12-01',2,300.00,1),(140,102,201,'2024-12-05',3,225.00,1),(142,101,201,'2024-12-01',2,300.00,1),(143,102,201,'2024-12-05',3,225.00,1),(145,101,201,'2024-12-01',2,300.00,3),(146,102,201,'2024-12-05',3,225.00,3),(148,101,201,'2024-12-01',2,300.00,3),(149,102,201,'2024-12-05',3,225.00,3),(151,101,201,'2024-12-01',2,300.00,3),(152,102,201,'2024-12-05',20,1500.00,3),(154,101,201,'2024-12-01',20,3000.00,3),(155,102,201,'2024-12-05',31,2325.00,3),(157,101,201,'2024-12-01',2,300.00,1),(158,102,201,'2024-12-05',3,225.00,1),(160,101,201,'2024-12-01',2,300.00,1),(161,102,201,'2024-12-05',3,225.00,1),(163,101,201,'2024-12-01',2,300.00,1),(164,102,201,'2024-12-05',3,225.00,1),(166,101,234,'2024-12-01',2,300.00,1);
+/*!40000 ALTER TABLE `sales` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sellers`
+--
+
+DROP TABLE IF EXISTS `sellers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sellers` (
+  `seller_id` int NOT NULL AUTO_INCREMENT,
+  `first_name` varchar(50) DEFAULT NULL,
+  `last_name` varchar(50) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `created_at` date DEFAULT NULL,
+  PRIMARY KEY (`seller_id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sellers`
+--
+
+LOCK TABLES `sellers` WRITE;
+/*!40000 ALTER TABLE `sellers` DISABLE KEYS */;
+INSERT INTO `sellers` VALUES (1,'Adam','Levi','adam.levi@sales.com','2024-01-01'),(2,'Noa','Cohen','noa.cohen@sales.com','2024-01-05'),(3,'Daniel','Peretz','daniel.peretz@sales.com','2024-01-10'),(4,'Maya','Rosen','maya.rosen@sales.com','2024-01-15'),(5,'Eitan','Katz','eitan.katz@sales.com','2024-02-01'),(6,'Shir','BenDavid','shir.bendavid@sales.com','2024-02-10'),(7,'Lior','Avrahami','lior.avrahami@sales.com','2024-02-20'),(8,'Yael','Friedman','yael.friedman@sales.com','2024-03-01'),(9,'Omer','Goldman','omer.goldman@sales.com','2024-03-10'),(10,'Tal','Mor','tal.mor@sales.com','2024-03-20'),(11,'Avi','Levi','avi.levi11@sales.com','2025-12-29'),(12,'Noam','Peretz','noam.peretz12@sales.com','2025-12-29'),(13,'Yael','Rosen','yael.rosen13@sales.com','2025-12-29'),(14,'Noam','Peretz','noam.peretz14@sales.com','2025-12-29'),(15,'Noam','Peretz','noam.peretz15@sales.com','2025-12-29'),(16,'Yael','Rosen','yael.rosen16@sales.com','2025-12-29'),(17,'Dana','Cohen','dana.cohen17@sales.com','2025-12-29'),(18,'Yael','Rosen','yael.rosen18@sales.com','2025-12-29'),(19,'Noam','Peretz','noam.peretz19@sales.com','2025-12-29'),(20,'Itay','Katz','itay.katz20@sales.com','2025-12-29');
+/*!40000 ALTER TABLE `sellers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Temporary view structure for view `vw_avg_sale_per_seller`
+--
+
+DROP TABLE IF EXISTS `vw_avg_sale_per_seller`;
+/*!50001 DROP VIEW IF EXISTS `vw_avg_sale_per_seller`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `vw_avg_sale_per_seller` AS SELECT 
+ 1 AS `id_seller`,
+ 1 AS `first_name`,
+ 1 AS `last_name`,
+ 1 AS `avg_sale_amount`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `vw_seller_ranking`
+--
+
+DROP TABLE IF EXISTS `vw_seller_ranking`;
+/*!50001 DROP VIEW IF EXISTS `vw_seller_ranking`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `vw_seller_ranking` AS SELECT 
+ 1 AS `id_seller`,
+ 1 AS `first_name`,
+ 1 AS `last_name`,
+ 1 AS `total_revenue`,
+ 1 AS `revenue_rank`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `vw_total_sales_per_seller`
+--
+
+DROP TABLE IF EXISTS `vw_total_sales_per_seller`;
+/*!50001 DROP VIEW IF EXISTS `vw_total_sales_per_seller`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `vw_total_sales_per_seller` AS SELECT 
+ 1 AS `id_seller`,
+ 1 AS `first_name`,
+ 1 AS `last_name`,
+ 1 AS `total_quantity`,
+ 1 AS `total_revenue`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Final view structure for view `vw_avg_sale_per_seller`
+--
+
+/*!50001 DROP VIEW IF EXISTS `vw_avg_sale_per_seller`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `vw_avg_sale_per_seller` AS select `s`.`id_seller` AS `id_seller`,`se`.`first_name` AS `first_name`,`se`.`last_name` AS `last_name`,avg(`s`.`sale_amount`) AS `avg_sale_amount` from (`sales` `s` join `sellers` `se` on((`se`.`seller_id` = `s`.`id_seller`))) group by `s`.`id_seller`,`se`.`first_name`,`se`.`last_name` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `vw_seller_ranking`
+--
+
+/*!50001 DROP VIEW IF EXISTS `vw_seller_ranking`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `vw_seller_ranking` AS with `seller_totals` as (select `s`.`id_seller` AS `id_seller`,sum(`s`.`sale_amount`) AS `total_revenue` from `sales` `s` group by `s`.`id_seller`) select `st`.`id_seller` AS `id_seller`,`se`.`first_name` AS `first_name`,`se`.`last_name` AS `last_name`,`st`.`total_revenue` AS `total_revenue`,rank() OVER (ORDER BY `st`.`total_revenue` desc )  AS `revenue_rank` from (`seller_totals` `st` join `sellers` `se` on((`se`.`seller_id` = `st`.`id_seller`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `vw_total_sales_per_seller`
+--
+
+/*!50001 DROP VIEW IF EXISTS `vw_total_sales_per_seller`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `vw_total_sales_per_seller` AS with `seller_totals` as (select `s`.`id_seller` AS `id_seller`,sum(`s`.`quantity`) AS `total_quantity`,sum(`s`.`sale_amount`) AS `total_revenue` from `sales` `s` group by `s`.`id_seller`) select `st`.`id_seller` AS `id_seller`,`se`.`first_name` AS `first_name`,`se`.`last_name` AS `last_name`,`st`.`total_quantity` AS `total_quantity`,`st`.`total_revenue` AS `total_revenue` from (`seller_totals` `st` join `sellers` `se` on((`se`.`seller_id` = `st`.`id_seller`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-02-23 20:02:30
+
+
+-- ==================== Custom Project SQL ====================
 
 -- #######################  error_logs  ###################################
 
@@ -747,6 +1047,7 @@ END$$
 DELIMITER ;
 
 CALL p_cleanup_demo_data(235, 31);
+
 
 
 
