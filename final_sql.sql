@@ -43,27 +43,6 @@ CREATE TABLE sellers (
   UNIQUE KEY email (email)
 ) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE generator_defaults (
-  config_id tinyint NOT NULL,
-  customer_first_name_prefix varchar(50) NOT NULL,
-  customer_last_name_prefix varchar(50) NOT NULL,
-  seller_first_name_prefix varchar(50) NOT NULL,
-  seller_last_name_prefix varchar(50) NOT NULL,
-  seller_email_prefix varchar(50) NOT NULL,
-  seller_email_suffix varchar(100) NOT NULL,
-  name_random_upper_bound int NOT NULL,
-  email_random_upper_bound int NOT NULL,
-  min_sale_quantity int NOT NULL,
-  max_sale_quantity int NOT NULL,
-  max_sale_days_back int NOT NULL,
-  PRIMARY KEY (config_id),
-  CHECK (name_random_upper_bound > 0),
-  CHECK (email_random_upper_bound > 0),
-  CHECK (min_sale_quantity > 0),
-  CHECK (max_sale_quantity >= min_sale_quantity),
-  CHECK (max_sale_days_back > 0)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 CREATE TABLE sales (
   sale_id int NOT NULL AUTO_INCREMENT,
   product_id int DEFAULT NULL,
@@ -85,7 +64,6 @@ INSERT INTO `customers` VALUES (201,'John','Doe','New York','USA'),(202,'Jane','
 INSERT INTO `products` VALUES (101,'Product A','Electronics',150.00),(102,'Product B','Clothing',75.00),(103,'Product C','Home Goods',100.00),(104,'Product D','Electronics',150.00),(105,'Product E','Clothing',150.00),(106,'Product F','Home Goods',100.00),(107,'Product G','Electronics',150.00);
 INSERT INTO `regions` VALUES ('Berlin','Europe'),('London','Europe'),('Los Angeles','North America'),('New York','North America'),('Paris','Europe'),('Rome','Europe'),('Sydney','Oceania'),('Tokyo','Asia'),('Toronto','North America');
 INSERT INTO `sellers` VALUES (1,'Adam','Levi','adam.levi@sales.com','2024-01-01'),(2,'Noa','Cohen','noa.cohen@sales.com','2024-01-05'),(3,'Daniel','Peretz','daniel.peretz@sales.com','2024-01-10'),(4,'Maya','Rosen','maya.rosen@sales.com','2024-01-15'),(5,'Eitan','Katz','eitan.katz@sales.com','2024-02-01'),(6,'Shir','BenDavid','shir.bendavid@sales.com','2024-02-10'),(7,'Lior','Avrahami','lior.avrahami@sales.com','2024-02-20'),(8,'Yael','Friedman','yael.friedman@sales.com','2024-03-01'),(9,'Omer','Goldman','omer.goldman@sales.com','2024-03-10'),(10,'Tal','Mor','tal.mor@sales.com','2024-03-20'),(11,'Avi','Levi','avi.levi11@sales.com','2025-12-29'),(12,'Noam','Peretz','noam.peretz12@sales.com','2025-12-29'),(13,'Yael','Rosen','yael.rosen13@sales.com','2025-12-29'),(14,'Noam','Peretz','noam.peretz14@sales.com','2025-12-29'),(15,'Noam','Peretz','noam.peretz15@sales.com','2025-12-29'),(16,'Yael','Rosen','yael.rosen16@sales.com','2025-12-29'),(17,'Dana','Cohen','dana.cohen17@sales.com','2025-12-29'),(18,'Yael','Rosen','yael.rosen18@sales.com','2025-12-29'),(19,'Noam','Peretz','noam.peretz19@sales.com','2025-12-29'),(20,'Itay','Katz','itay.katz20@sales.com','2025-12-29');
-INSERT INTO `generator_defaults` VALUES (1,'Customer_','Last_','Seller_','Last_','seller_','@mail.com',10000,1000000,1,10,365);
 INSERT INTO `sales` VALUES (1,101,201,'2024-01-05',3,450.00,3),(2,102,202,'2024-02-10',1,150.00,2),(3,103,203,'2024-03-15',2,300.00,8),(4,104,204,'2024-04-01',5,750.00,3),(5,101,205,'2024-04-20',2,300.00,1),(6,102,206,'2024-05-10',4,600.00,6),(7,103,207,'2024-06-15',1,100.00,7),(8,105,208,'2024-07-05',3,450.00,4),(9,106,209,'2024-08-10',2,200.00,1),(10,107,210,'2024-09-01',6,900.00,3),(12,107,210,'2025-04-14',2,300.00,1),(14,101,206,'2025-09-22',3,450.00,20),(16,101,209,'2025-03-28',4,600.00,15),(21,102,206,'2026-01-22',4,300.00,1),(23,103,208,'2025-11-07',7,700.00,13),(30,107,204,'2025-07-08',10,1500.00,4),(51,101,201,'2024-12-01',2,300.00,1),(52,102,201,'2024-12-05',3,225.00,1),(54,101,234,'2024-12-01',2,300.00,1),(55,101,201,'2024-12-01',2,300.00,1),(56,102,201,'2024-12-05',3,225.00,1),(58,101,201,'2024-12-01',2,300.00,1),(59,102,201,'2024-12-05',3,225.00,1),(61,101,234,'2024-12-01',2,300.00,1),(62,101,201,'2024-12-01',2,300.00,1),(63,102,201,'2024-12-05',3,225.00,1),(65,101,234,'2024-12-01',2,300.00,1),(66,101,201,'2024-12-01',2,300.00,1),(67,102,201,'2024-12-05',3,225.00,1),(69,102,233,'2025-08-25',10,750.00,20),(70,101,201,'2026-02-20',2,300.00,1),(71,101,201,'2024-12-01',2,300.00,1),(72,102,201,'2024-12-05',3,225.00,1),(78,103,233,'2026-01-02',4,400.00,9),(79,107,206,'2026-01-11',9,1350.00,15),(87,101,234,'2025-07-18',8,1200.00,3),(92,106,205,'2025-09-17',2,200.00,18),(95,105,205,'2025-12-17',4,600.00,5),(100,104,209,'2025-11-25',8,1200.00,17),(104,107,234,'2025-04-07',1,150.00,2),(105,103,232,'2025-10-11',9,900.00,7),(106,107,232,'2025-05-14',7,1050.00,10),(111,101,203,'2025-06-18',8,1200.00,18),(116,105,206,'2025-09-01',3,450.00,13),(119,102,231,'2026-01-23',5,375.00,6),(123,103,202,'2025-05-19',8,800.00,4),(127,104,204,'2025-07-19',10,1500.00,8),(133,104,205,'2025-06-24',6,900.00,20),(135,101,201,'2024-12-01',2,300.00,1),(136,102,201,'2024-12-05',3,225.00,1),(138,101,234,'2024-12-01',2,300.00,1),(139,101,201,'2024-12-01',2,300.00,1),(140,102,201,'2024-12-05',3,225.00,1),(142,101,201,'2024-12-01',2,300.00,1),(143,102,201,'2024-12-05',3,225.00,1),(145,101,201,'2024-12-01',2,300.00,3),(146,102,201,'2024-12-05',3,225.00,3),(148,101,201,'2024-12-01',2,300.00,3),(149,102,201,'2024-12-05',3,225.00,3),(151,101,201,'2024-12-01',2,300.00,3),(152,102,201,'2024-12-05',20,1500.00,3),(154,101,201,'2024-12-01',20,3000.00,3),(155,102,201,'2024-12-05',31,2325.00,3),(157,101,201,'2024-12-01',2,300.00,1),(158,102,201,'2024-12-05',3,225.00,1),(160,101,201,'2024-12-01',2,300.00,1),(161,102,201,'2024-12-05',3,225.00,1),(163,101,201,'2024-12-01',2,300.00,1),(164,102,201,'2024-12-05',3,225.00,1),(166,101,234,'2024-12-01',2,300.00,1);
 
 -- #######################  reports  ###################################
@@ -163,41 +141,63 @@ CREATE PROCEDURE p_generate_random_customers(IN p_count INT)
 BEGIN
     DECLARE v_counter INT DEFAULT 0;
     DECLARE v_exists INT DEFAULT 1;
+    DECLARE v_random_city VARCHAR(50);
     DECLARE v_random_country VARCHAR(50);
+    DECLARE v_seed_first_name VARCHAR(50);
+    DECLARE v_seed_last_name VARCHAR(50);
     DECLARE v_first_name VARCHAR(50);
     DECLARE v_last_name VARCHAR(50);
-    DECLARE v_customer_first_name_prefix VARCHAR(50);
-    DECLARE v_customer_last_name_prefix VARCHAR(50);
-    DECLARE v_name_random_upper_bound INT;
+    DECLARE v_first_name_max_len INT;
+    DECLARE v_last_name_max_len INT;
+    DECLARE v_token BIGINT UNSIGNED;
 
-    SELECT
-        gd.customer_first_name_prefix,
-        gd.customer_last_name_prefix,
-        gd.name_random_upper_bound
-    INTO
-        v_customer_first_name_prefix,
-        v_customer_last_name_prefix,
-        v_name_random_upper_bound
-    FROM generator_defaults gd
-    ORDER BY gd.config_id
+    SELECT c.CHARACTER_MAXIMUM_LENGTH
+    INTO v_first_name_max_len
+    FROM INFORMATION_SCHEMA.COLUMNS c
+    WHERE c.TABLE_SCHEMA = DATABASE()
+      AND c.TABLE_NAME = 'customers'
+      AND c.COLUMN_NAME = 'first_name'
     LIMIT 1;
 
-    IF v_customer_first_name_prefix IS NULL
-       OR v_customer_last_name_prefix IS NULL
-       OR v_name_random_upper_bound IS NULL
-       OR v_name_random_upper_bound <= 0 THEN
+    SELECT c.CHARACTER_MAXIMUM_LENGTH
+    INTO v_last_name_max_len
+    FROM INFORMATION_SCHEMA.COLUMNS c
+    WHERE c.TABLE_SCHEMA = DATABASE()
+      AND c.TABLE_NAME = 'customers'
+      AND c.COLUMN_NAME = 'last_name'
+    LIMIT 1;
+
+    IF v_first_name_max_len IS NULL OR v_last_name_max_len IS NULL THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Missing random-customer configuration in generator_defaults';
+            SET MESSAGE_TEXT = 'Missing customers column metadata';
     END IF;
-    
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM customers
+        WHERE first_name IS NOT NULL
+          AND last_name IS NOT NULL
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Cannot generate customers without existing customer names';
+    END IF;
 
     WHILE v_counter < p_count DO
 
         SET v_exists = 1;
 
         WHILE v_exists > 0 DO
-            SET v_first_name = CONCAT(v_customer_first_name_prefix, FLOOR(RAND() * v_name_random_upper_bound));
-            SET v_last_name  = CONCAT(v_customer_last_name_prefix, FLOOR(RAND() * v_name_random_upper_bound));
+            SELECT first_name, last_name
+            INTO v_seed_first_name, v_seed_last_name
+            FROM customers
+            WHERE first_name IS NOT NULL
+              AND last_name IS NOT NULL
+            ORDER BY RAND()
+            LIMIT 1;
+
+            SET v_token = UUID_SHORT();
+            SET v_first_name = LEFT(CONCAT(v_seed_first_name, v_token), v_first_name_max_len);
+            SET v_last_name = LEFT(CONCAT(v_seed_last_name, v_token), v_last_name_max_len);
 
             SELECT COUNT(*)
             INTO v_exists
@@ -205,19 +205,28 @@ BEGIN
             WHERE first_name = v_first_name
               AND last_name = v_last_name;
         END WHILE;
-        -- Get random existing country
-        SELECT country
-        INTO v_random_country
+
+        SELECT city, country
+        INTO v_random_city, v_random_country
         FROM customers
-        WHERE country IS NOT NULL
+        WHERE city IS NOT NULL
+          AND country IS NOT NULL
         ORDER BY RAND()
         LIMIT 1;
+
+        IF v_random_city IS NULL THEN
+            SELECT city
+            INTO v_random_city
+            FROM regions
+            ORDER BY RAND()
+            LIMIT 1;
+        END IF;
 
         INSERT INTO customers(first_name, last_name, city, country)
         VALUES (
             v_first_name,
             v_last_name,
-            (SELECT city FROM regions ORDER BY RAND() LIMIT 1),
+            v_random_city,
             v_random_country
         );
 
@@ -235,44 +244,65 @@ CREATE PROCEDURE p_generate_random_sellers(IN p_count INT)
 BEGIN
     DECLARE v_counter INT DEFAULT 0;
     DECLARE v_exists INT DEFAULT 1;
+    DECLARE v_seed_first_name VARCHAR(50);
+    DECLARE v_seed_last_name VARCHAR(50);
     DECLARE v_first_name VARCHAR(50);
     DECLARE v_last_name VARCHAR(50);
     DECLARE v_email VARCHAR(100);
-    DECLARE v_seller_first_name_prefix VARCHAR(50);
-    DECLARE v_seller_last_name_prefix VARCHAR(50);
-    DECLARE v_seller_email_prefix VARCHAR(50);
-    DECLARE v_seller_email_suffix VARCHAR(100);
-    DECLARE v_name_random_upper_bound INT;
-    DECLARE v_email_random_upper_bound INT;
+    DECLARE v_email_domain VARCHAR(100);
+    DECLARE v_first_name_max_len INT;
+    DECLARE v_last_name_max_len INT;
+    DECLARE v_email_max_len INT;
+    DECLARE v_token BIGINT UNSIGNED;
 
-    SELECT
-        gd.seller_first_name_prefix,
-        gd.seller_last_name_prefix,
-        gd.seller_email_prefix,
-        gd.seller_email_suffix,
-        gd.name_random_upper_bound,
-        gd.email_random_upper_bound
-    INTO
-        v_seller_first_name_prefix,
-        v_seller_last_name_prefix,
-        v_seller_email_prefix,
-        v_seller_email_suffix,
-        v_name_random_upper_bound,
-        v_email_random_upper_bound
-    FROM generator_defaults gd
-    ORDER BY gd.config_id
+    SELECT c.CHARACTER_MAXIMUM_LENGTH
+    INTO v_first_name_max_len
+    FROM INFORMATION_SCHEMA.COLUMNS c
+    WHERE c.TABLE_SCHEMA = DATABASE()
+      AND c.TABLE_NAME = 'sellers'
+      AND c.COLUMN_NAME = 'first_name'
     LIMIT 1;
 
-    IF v_seller_first_name_prefix IS NULL
-       OR v_seller_last_name_prefix IS NULL
-       OR v_seller_email_prefix IS NULL
-       OR v_seller_email_suffix IS NULL
-       OR v_name_random_upper_bound IS NULL
-       OR v_email_random_upper_bound IS NULL
-       OR v_name_random_upper_bound <= 0
-       OR v_email_random_upper_bound <= 0 THEN
+    SELECT c.CHARACTER_MAXIMUM_LENGTH
+    INTO v_last_name_max_len
+    FROM INFORMATION_SCHEMA.COLUMNS c
+    WHERE c.TABLE_SCHEMA = DATABASE()
+      AND c.TABLE_NAME = 'sellers'
+      AND c.COLUMN_NAME = 'last_name'
+    LIMIT 1;
+
+    SELECT c.CHARACTER_MAXIMUM_LENGTH
+    INTO v_email_max_len
+    FROM INFORMATION_SCHEMA.COLUMNS c
+    WHERE c.TABLE_SCHEMA = DATABASE()
+      AND c.TABLE_NAME = 'sellers'
+      AND c.COLUMN_NAME = 'email'
+    LIMIT 1;
+
+    SELECT SUBSTRING_INDEX(email, CHAR(64), -1)
+    INTO v_email_domain
+    FROM sellers
+    WHERE email IS NOT NULL
+      AND INSTR(email, CHAR(64)) > 0
+    ORDER BY RAND()
+    LIMIT 1;
+
+    IF v_first_name_max_len IS NULL
+       OR v_last_name_max_len IS NULL
+       OR v_email_max_len IS NULL
+       OR v_email_domain IS NULL THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Missing random-seller configuration in generator_defaults';
+            SET MESSAGE_TEXT = 'Missing seller generation metadata';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM sellers
+        WHERE first_name IS NOT NULL
+          AND last_name IS NOT NULL
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Cannot generate sellers without existing seller names';
     END IF;
 
     WHILE v_counter < p_count DO
@@ -281,9 +311,25 @@ BEGIN
 
         WHILE v_exists > 0 DO
 
-            SET v_first_name = CONCAT(v_seller_first_name_prefix, FLOOR(RAND() * v_name_random_upper_bound));
-            SET v_last_name  = CONCAT(v_seller_last_name_prefix, FLOOR(RAND() * v_name_random_upper_bound));
-            SET v_email      = CONCAT(v_seller_email_prefix, FLOOR(RAND() * v_email_random_upper_bound), v_seller_email_suffix);
+            SELECT first_name, last_name
+            INTO v_seed_first_name, v_seed_last_name
+            FROM sellers
+            WHERE first_name IS NOT NULL
+              AND last_name IS NOT NULL
+            ORDER BY RAND()
+            LIMIT 1;
+
+            SET v_token = UUID_SHORT();
+            SET v_first_name = LEFT(CONCAT(v_seed_first_name, v_token), v_first_name_max_len);
+            SET v_last_name = LEFT(CONCAT(v_seed_last_name, v_token), v_last_name_max_len);
+            SET v_email = LEFT(
+                CONCAT(
+                    LOWER(REPLACE(CONCAT(v_first_name, v_last_name, v_token), ' ', '')),
+                    CHAR(64),
+                    v_email_domain
+                ),
+                v_email_max_len
+            );
 
             SELECT COUNT(*)
             INTO v_exists
@@ -326,16 +372,16 @@ BEGIN
     DECLARE v_quantity_range INT;
 
     SELECT
-        gd.min_sale_quantity,
-        gd.max_sale_quantity,
-        gd.max_sale_days_back
+        MIN(quantity),
+        MAX(quantity),
+        MAX(DATEDIFF(CURDATE(), sale_date))
     INTO
         v_min_sale_quantity,
         v_max_sale_quantity,
         v_max_sale_days_back
-    FROM generator_defaults gd
-    ORDER BY gd.config_id
-    LIMIT 1;
+    FROM sales
+    WHERE quantity IS NOT NULL
+      AND sale_date IS NOT NULL;
 
     IF v_min_sale_quantity IS NULL
        OR v_max_sale_quantity IS NULL
@@ -344,7 +390,7 @@ BEGIN
        OR v_max_sale_quantity < v_min_sale_quantity
        OR v_max_sale_days_back <= 0 THEN
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Missing random-sales configuration in generator_defaults';
+            SET MESSAGE_TEXT = 'Cannot derive random-sales limits from existing sales data';
     END IF;
 
     SET v_quantity_range = (v_max_sale_quantity - v_min_sale_quantity) + 1;
@@ -368,7 +414,7 @@ BEGIN
         LIMIT 1;
 
         SET v_quantity = FLOOR(v_min_sale_quantity + RAND() * v_quantity_range);
-        SET v_sale_date = DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * v_max_sale_days_back) DAY);
+        SET v_sale_date = DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * (v_max_sale_days_back + 1)) DAY);
 
         INSERT INTO sales(product_id, customer_id, sale_date, quantity, sale_amount, id_seller)
         VALUES (
@@ -428,7 +474,14 @@ END$$
 
 DELIMITER ;
 
-CALL p_generate_random_data(10, 5, 20);
+SET @demo_customers = (SELECT COUNT(*) FROM regions);
+SET @demo_sellers = (SELECT COUNT(*) FROM products);
+SET @demo_sales = (
+    SELECT COUNT(*) * (SELECT COUNT(*) FROM regions)
+    FROM products
+);
+
+CALL p_generate_random_data(@demo_customers, @demo_sellers, @demo_sales);
 
 SELECT * FROM customers WHERE customer_id > @max_customer_before;
 SELECT * FROM sellers WHERE seller_id > @max_seller_before;
@@ -855,4 +908,13 @@ END$$
 
 DELIMITER ;
 
-CALL p_cleanup_demo_data(235, 31);
+SET @cleanup_customer_threshold = (
+    SELECT IFNULL(MAX(customer_id), 0) + 1
+    FROM customers
+);
+SET @cleanup_seller_threshold = (
+    SELECT IFNULL(MAX(seller_id), 0) + 1
+    FROM sellers
+);
+
+CALL p_cleanup_demo_data(@cleanup_customer_threshold, @cleanup_seller_threshold);
