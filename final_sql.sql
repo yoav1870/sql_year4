@@ -357,7 +357,11 @@ DELIMITER ;
 -- Generate Random Sales
 DELIMITER $$
 
-CREATE PROCEDURE p_generate_random_sales(IN p_count INT)
+CREATE PROCEDURE p_generate_random_sales(
+    IN p_count INT,
+    IN p_min_customer_id INT,
+    IN p_min_seller_id INT
+)
 BEGIN
     DECLARE v_counter INT DEFAULT 0;
     DECLARE v_customer_id INT;
@@ -399,11 +403,13 @@ BEGIN
 
         SELECT customer_id INTO v_customer_id
         FROM customers
+        WHERE customer_id >= p_min_customer_id
         ORDER BY RAND()
         LIMIT 1;
 
         SELECT seller_id INTO v_seller_id
         FROM sellers
+        WHERE seller_id >= p_min_seller_id
         ORDER BY RAND()
         LIMIT 1;
 
@@ -454,7 +460,11 @@ main_block: BEGIN
 
     CALL p_generate_random_customers(p_customers);
     CALL p_generate_random_sellers(p_sellers);
-    CALL p_generate_random_sales(p_sales);
+    CALL p_generate_random_sales(
+        p_sales,
+        v_max_customer_before + 1,
+        v_max_seller_before + 1
+    );
 
     COMMIT;
 
