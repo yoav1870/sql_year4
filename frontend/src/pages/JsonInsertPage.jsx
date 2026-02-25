@@ -2,7 +2,10 @@ import { useState } from "react";
 import AlertMessage from "../components/AlertMessage";
 import LoadingIndicator from "../components/LoadingIndicator";
 import Table from "../components/Table";
-import { cleanupSalesDemoData, insertSalesJson } from "../services/salesService";
+import {
+  cleanupSalesDemoData,
+  insertSalesJson,
+} from "../services/salesService";
 
 const testCases = [
   {
@@ -15,10 +18,10 @@ const testCases = [
         SellerID: 1,
         purchases: [
           { productId: 101, quantity: 2, saleDate: "2024-12-01" },
-          { productId: 102, quantity: 3, saleDate: "2024-12-05" }
-        ]
-      }
-    }
+          { productId: 102, quantity: 3, saleDate: "2024-12-05" },
+        ],
+      },
+    },
   },
   {
     id: "invalid-seller",
@@ -28,9 +31,9 @@ const testCases = [
         CustomerFirstName: "Mike",
         CustomerLastName: "Smith",
         SellerID: 9999,
-        purchases: [{ productId: 101, quantity: 2, saleDate: "2024-12-01" }]
-      }
-    }
+        purchases: [{ productId: 101, quantity: 2, saleDate: "2024-12-01" }],
+      },
+    },
   },
   {
     id: "invalid-product",
@@ -40,9 +43,9 @@ const testCases = [
         CustomerFirstName: "Anna",
         CustomerLastName: "White",
         SellerID: 1,
-        purchases: [{ productId: 9999, quantity: 2, saleDate: "2024-12-01" }]
-      }
-    }
+        purchases: [{ productId: 9999, quantity: 2, saleDate: "2024-12-01" }],
+      },
+    },
   },
   {
     id: "invalid-quantity",
@@ -52,9 +55,9 @@ const testCases = [
         CustomerFirstName: "Sara",
         CustomerLastName: "Blue",
         SellerID: 1,
-        purchases: [{ productId: 101, quantity: -5, saleDate: "2024-12-01" }]
-      }
-    }
+        purchases: [{ productId: 101, quantity: -5, saleDate: "2024-12-01" }],
+      },
+    },
   },
   {
     id: "invalid-date",
@@ -64,9 +67,9 @@ const testCases = [
         CustomerFirstName: "Tom",
         CustomerLastName: "Green",
         SellerID: 1,
-        purchases: [{ productId: 101, quantity: 2, saleDate: null }]
-      }
-    }
+        purchases: [{ productId: 101, quantity: 2, saleDate: null }],
+      },
+    },
   },
   {
     id: "mixed",
@@ -79,10 +82,10 @@ const testCases = [
         purchases: [
           { productId: 101, quantity: 2, saleDate: "2024-12-01" },
           { productId: 9999, quantity: 2, saleDate: "2024-12-01" },
-          { productId: 102, quantity: -1, saleDate: "2024-12-01" }
-        ]
-      }
-    }
+          { productId: 102, quantity: -1, saleDate: "2024-12-01" },
+        ],
+      },
+    },
   },
   {
     id: "missing-field",
@@ -91,9 +94,9 @@ const testCases = [
       sales: {
         CustomerFirstName: "NoLastName",
         SellerID: 1,
-        purchases: [{ productId: 101, quantity: 2, saleDate: "2024-12-01" }]
-      }
-    }
+        purchases: [{ productId: 101, quantity: 2, saleDate: "2024-12-01" }],
+      },
+    },
   },
   {
     id: "future-date",
@@ -103,9 +106,9 @@ const testCases = [
         CustomerFirstName: "Future",
         CustomerLastName: "Date",
         SellerID: 1,
-        purchases: [{ productId: 101, quantity: 1, saleDate: "2030-01-01" }]
-      }
-    }
+        purchases: [{ productId: 101, quantity: 1, saleDate: "2030-01-01" }],
+      },
+    },
   },
   {
     id: "invalid-json-syntax",
@@ -119,8 +122,8 @@ const testCases = [
       { "productId": 101, "quantity": 2, "saleDate": "2024-12-01" }
     ]
   }
-`
-  }
+`,
+  },
 ];
 
 const toPrettyJson = (value) => JSON.stringify(value, null, 2);
@@ -141,7 +144,7 @@ function JsonInsertPage() {
     if (typeof match.rawText === "string") {
       setJsonText(match.rawText);
     } else {
-    setJsonText(toPrettyJson(match.payload));
+      setJsonText(toPrettyJson(match.payload));
     }
     setErrorMessage("");
     setSuccessMessage("");
@@ -161,12 +164,17 @@ function JsonInsertPage() {
     try {
       const response = await insertSalesJson(jsonText);
       setResult(response.data || null);
-      setSuccessMessage("Insert completed");
-      if (response.data?.inserted_rows === 0 && response.data?.failed_rows > 0) {
+      // setSuccessMessage("Insert completed");
+      if (
+        response.data?.inserted_rows === 0 &&
+        response.data?.failed_rows > 0
+      ) {
         setErrorMessage("Insert failed completely. Review failed items.");
       }
     } catch (error) {
-      setErrorMessage(error.response?.data?.message || "Failed to insert sales JSON");
+      setErrorMessage(
+        error.response?.data?.message || "Failed to insert sales JSON",
+      );
     } finally {
       setLoading(false);
     }
@@ -185,7 +193,9 @@ function JsonInsertPage() {
       setCleanupResult(response.data || null);
       setSuccessMessage("Cleanup completed");
     } catch (error) {
-      setErrorMessage(error.response?.data?.message || "Failed to cleanup demo data");
+      setErrorMessage(
+        error.response?.data?.message || "Failed to cleanup demo data",
+      );
     } finally {
       setLoading(false);
     }
@@ -239,13 +249,15 @@ function JsonInsertPage() {
             Deleted sales: <strong>{cleanupResult.deleted_sales}</strong>
           </p>
           <p>
-            Deleted customers: <strong>{cleanupResult.deleted_customers}</strong>
+            Deleted customers:{" "}
+            <strong>{cleanupResult.deleted_customers}</strong>
           </p>
           <p>
             Deleted sellers: <strong>{cleanupResult.deleted_sellers}</strong>
           </p>
           <p>
-            Deleted error logs: <strong>{cleanupResult.deleted_error_logs}</strong>
+            Deleted error logs:{" "}
+            <strong>{cleanupResult.deleted_error_logs}</strong>
           </p>
           <p>
             Status: <strong>{cleanupResult.status}</strong>
@@ -273,9 +285,11 @@ function JsonInsertPage() {
           columns={[
             { key: "productId", label: "Product ID" },
             { key: "quantity", label: "Quantity" },
-            { key: "saleDate", label: "Sale Date" }
+            { key: "saleDate", label: "Sale Date" },
           ]}
-          rows={Array.isArray(result.completed_items) ? result.completed_items : []}
+          rows={
+            Array.isArray(result.completed_items) ? result.completed_items : []
+          }
         />
       )}
 
@@ -286,7 +300,7 @@ function JsonInsertPage() {
             { key: "productId", label: "Product ID" },
             { key: "quantity", label: "Quantity" },
             { key: "saleDate", label: "Sale Date" },
-            { key: "error", label: "Error" }
+            { key: "error", label: "Error" },
           ]}
           rows={Array.isArray(result.failed_items) ? result.failed_items : []}
         />

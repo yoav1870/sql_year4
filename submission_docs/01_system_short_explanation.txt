@@ -1,9 +1,6 @@
 System Short Explanation
 ========================
 
-System name:
-Sales Management + JSON Ingestion System
-
 Overview:
 This system manages sales data in a MySQL database called `sales`. 
 It includes core entities such as customers, sellers, products, regions, and sales transactions. 
@@ -21,6 +18,55 @@ Main database components:
   - Error logging (`p_log_error`)
   - Demo data cleanup (`p_cleanup_demo_data`)
 
+Frontend pages:
+- Reports page:
+  - View total sales per seller (quantity + revenue)
+  - View seller ranking by revenue
+  - View average sale amount per seller
+- Generate Random Data page:
+  - Insert random customers, sellers, and sales using one form
+  - View the rows that were inserted
+- Insert JSON page:
+  - Paste sales JSON and insert it into the database
+  - Use built-in test cases (valid / invalid / mixed)
+  - View inserted rows count, failed rows count, completed items, failed items
+  - Run demo cleanup
+- Error Logs page:
+  - View logged validation/processing errors and original JSON input
+
+How to Test :
+1. Prepare the database in MySQL first:
+   - Run the SQL build script first `final_script.sql` to create the `sales` database, tables, views, and procedures.
+2. Configure environment files:
+   - Create `.env` files from the provided `.env.example` files (backend).
+   - Update the values in `.env`.
+3. Install and run both services:
+   - Backend:
+     - Run `npm i`
+     - Run `npm run dev`
+   - Frontend:
+     - Run `npm i`
+     - Run `npm run dev`
+4. Open the frontend and test each page:
+   - Reports:
+     - Open `Reports` page.
+     - Confirm all 3 report tables load and display data.
+   - Generate Random Data:
+     - Open `Generate Random Data`.
+     - Enter values .
+     - Click `Generate`.
+     - Confirm success message and inserted rows tables appear.
+   - Insert JSON:
+     - Open `Insert JSON`.
+     - Choose `Valid JSON` and click `Insert`.
+     - Confirm inserted rows and completed items are shown.
+     - Choose invalid cases and click `Insert`.
+     - Confirm failed items and error messages are shown.
+   - Error Logs:
+     - Open `Error Logs`.
+     - Confirm errors from invalid JSON tests are recorded and displayed.
+5. Optional cleanup:
+   - Return to `Insert JSON` page and click `Cleanup Demo Data`.
 
 Summary:
 The project provides an end-to-end database workflow: 
